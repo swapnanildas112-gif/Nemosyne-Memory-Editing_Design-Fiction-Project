@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>An Introduction to Memory Editing: NeuroCraft Pro 14 - UsTube</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600;700&family=Orbitron:wght@500;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+:root{
+  --lime:#c8f542; --cyan:#19f0ff; --orange:#ff8a1f; --green:#39ff88; --pink:#ff3df2;
+  --ink:#050806; --txt:#e9f5d8; --dim:#8fa07c;
+  --glass:rgba(10,16,10,.85);
+  --cut:14px;
+  --chamfer:polygon(var(--cut) 0,100% 0,100% calc(100% - var(--cut)),calc(100% - var(--cut)) 100%,0 100%,0 var(--cut));
+}
+*{box-sizing:border-box}
+html,body{background:var(--ink)}
+body{
+  font-family:'Chakra Petch',system-ui,sans-serif;color:var(--txt);-webkit-font-smoothing:antialiased;
+  min-height:100vh;position:relative;
+  background:
+    radial-gradient(900px 500px at 12% -5%,rgba(200,245,66,.12),transparent 60%),
+    radial-gradient(800px 600px at 100% 10%,rgba(25,240,255,.08),transparent 60%),
+    radial-gradient(700px 500px at 50% 110%,rgba(255,138,31,.1),transparent 60%),
+    radial-gradient(rgba(200,245,66,.08) 1px,transparent 1.3px) 0 0/14px 14px,
+    var(--ink);
+  background-attachment:fixed;
+}
+body::before{content:"";position:fixed;inset:0;z-index:200;pointer-events:none;
+  background:repeating-linear-gradient(0deg,rgba(255,255,255,.022) 0 1px,transparent 1px 3px);mix-blend-mode:overlay}
+.horizon{position:fixed;left:-20%;right:-20%;bottom:0;height:38vh;z-index:0;pointer-events:none;opacity:.25;
+  background:
+    repeating-linear-gradient(90deg,rgba(25,240,255,.4) 0 1px,transparent 1px 70px),
+    repeating-linear-gradient(0deg,rgba(255,61,242,.3) 0 1px,transparent 1px 38px);
+  transform:perspective(420px) rotateX(62deg);transform-origin:bottom;
+  -webkit-mask-image:linear-gradient(to top,#000 10%,transparent 90%);mask-image:linear-gradient(to top,#000 10%,transparent 90%)}
+.wrap{position:relative;z-index:5}
+.disp{font-family:'Orbitron',sans-serif;letter-spacing:.04em}
+.mono{font-family:'Space Mono',monospace}
+
+::-webkit-scrollbar{width:8px;height:8px}
+::-webkit-scrollbar-track{background:var(--ink)}
+::-webkit-scrollbar-thumb{background:var(--lime);border-radius:4px}
+
+/* ===== HUD glass panel with chamfered corners & solid styling ===== */
+.halo{filter:drop-shadow(0 0 12px rgba(200,245,66,.15)) drop-shadow(0 10px 24px rgba(0,0,0,.6))}
+.halo.cy{filter:drop-shadow(0 0 12px rgba(25,240,255,.15)) drop-shadow(0 10px 24px rgba(0,0,0,.6))}
+.halo.or{filter:drop-shadow(0 0 12px rgba(255,138,31,.15)) drop-shadow(0 10px 24px rgba(0,0,0,.6))}
+.hud{
+  --b1:var(--lime);--b2:var(--cyan);
+  position:relative;clip-path:var(--chamfer);
+  background:var(--glass);
+  border:1px solid var(--b1);
+}
+.hud.or{--b1:var(--orange);--b2:var(--pink)}
+.hud.cy{--b1:var(--cyan);--b2:var(--green)}
+.hud.sm{--cut:8px}
+.hud-label{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--cyan);text-shadow:0 0 6px rgba(25,240,255,.5)}
+.hud-label.or{color:var(--orange);text-shadow:0 0 6px rgba(255,138,31,.5)}
+.hud-label.li{color:var(--lime);text-shadow:0 0 6px rgba(200,245,66,.5)}
+.tick{display:inline-block;width:8px;height:8px;background:var(--lime);box-shadow:0 0 6px var(--lime);margin-right:8px;clip-path:polygon(0 0,100% 0,100% 100%)}
+
+/* ===== header ===== */
+header.top{background:rgba(5,8,6,.9);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  position:sticky;top:0;z-index:60;border-bottom:2px solid var(--lime);
+  box-shadow:0 8px 30px rgba(0,0,0,.6)}
+.iconbtn{width:40px;height:40px;display:flex;align-items:center;justify-content:center;color:var(--txt);border-radius:50%;transition:.2s;position:relative}
+.iconbtn:hover{background:rgba(200,245,66,.2);color:var(--lime);box-shadow:0 0 10px rgba(200,245,66,.3)}
+.searchbox{flex:1;display:flex;align-items:center;padding:8px 16px;background:rgba(0,0,0,.6);
+  border:1px solid var(--lime);border-radius:999px 0 0 999px;transition:.2s}
+.searchbox:focus-within{border-color:var(--cyan);box-shadow:0 0 12px rgba(25,240,255,.3)}
+.searchbtn{background:var(--lime);border:1px solid var(--lime);border-left:0;
+  border-radius:0 999px 999px 0;padding:0 22px;color:#050806;font-weight:700;transition:.2s}
+.searchbtn:hover{background:var(--cyan);border-color:var(--cyan);box-shadow:0 0 12px rgba(25,240,255,.5)}
+.btn-solid{background:var(--lime);color:#050806;font-weight:700;letter-spacing:.06em;transition:.2s;
+  clip-path:polygon(8px 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%,0 8px)}
+.btn-solid:hover{background:var(--cyan);box-shadow:0 0 16px rgba(25,240,255,.6)}
+.btn-hot{background:var(--orange);color:#050806;font-weight:700}
+.pill{display:inline-flex;align-items:center;gap:8px;padding:8px 16px;font-weight:600;font-size:12px;letter-spacing:.06em;color:var(--txt);
+  background:rgba(20,28,20,.9);transition:.2s;
+  clip-path:polygon(8px 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%,0 8px);position:relative;
+  border:1px solid rgba(200,245,66,.3)}
+.pill:hover{background:var(--lime);color:#050806;border-color:var(--lime);box-shadow:0 0 12px rgba(200,245,66,.5)}
+.chip{padding:6px 14px;font-size:12px;font-weight:600;letter-spacing:.06em;cursor:pointer;white-space:nowrap;color:var(--txt);
+  background:rgba(20,28,20,.8);border:1px solid rgba(255,255,255,.15);transition:.2s;
+  clip-path:polygon(7px 0,100% 0,100% calc(100% - 7px),calc(100% - 7px) 100%,0 100%,0 7px)}
+.chip:hover{border-color:var(--cyan);color:var(--cyan)}
+.chip.on{background:var(--lime);color:#050806;border-color:var(--lime)}
+
+/* ===== video ===== */
+.vid{position:relative;aspect-ratio:16/9;background:#000;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;user-select:none}
+.bracket{position:absolute;width:22px;height:22px;z-index:7;pointer-events:none;border:2px solid var(--lime);filter:drop-shadow(0 0 4px var(--lime))}
+.bracket.tl{top:12px;left:12px;border-right:0;border-bottom:0}
+.bracket.tr{top:12px;right:12px;border-left:0;border-bottom:0}
+.bracket.bl{bottom:12px;left:12px;border-right:0;border-top:0}
+.bracket.br{bottom:12px;right:12px;border-left:0;border-top:0}
+.playbig{width:76px;height:56px;display:flex;align-items:center;justify-content:center;font-size:22px;color:#050806;background:var(--lime);transition:.2s;
+  clip-path:polygon(12px 0,100% 0,100% calc(100% - 12px),calc(100% - 12px) 100%,0 100%,0 12px);box-shadow:0 0 20px rgba(200,245,66,.5)}
+.group:hover .playbig{transform:scale(1.1);background:var(--cyan);box-shadow:0 0 20px rgba(25,240,255,.6)}
+.ctrl{position:absolute;bottom:0;left:0;right:0;z-index:20;padding:8px 14px 10px;opacity:0;transition:opacity .2s;
+  background:rgba(5,8,6,.92);border-top:1px solid var(--lime)}
+.group:hover .ctrl,.ctrl:focus-within{opacity:1}
+.cbtn{width:32px;height:32px;display:flex;align-items:center;justify-content:center;color:var(--txt);transition:.15s}
+.cbtn:hover{color:var(--lime);text-shadow:0 0 8px var(--lime)}
+input[type=range]{-webkit-appearance:none;appearance:none;background:transparent;width:100%;cursor:pointer;--p:0%}
+input[type=range]:focus{outline:none}
+input[type=range]::-webkit-slider-runnable-track{height:4px;border-radius:2px;background:rgba(255,255,255,.25)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;height:12px;width:12px;margin-top:-4px;background:var(--lime);cursor:pointer;border-radius:2px;box-shadow:0 0 6px var(--lime)}
+input[type=range]:hover::-webkit-slider-thumb{transform:scale(1.3)}
+
+/* ===== cards & misc ===== */
+.thumb{position:relative;overflow:hidden;aspect-ratio:16/9;flex-shrink:0;width:10rem;background:#0b120b;
+  clip-path:polygon(9px 0,100% 0,100% calc(100% - 9px),calc(100% - 9px) 100%,0 100%,0 9px);border:1px solid rgba(200,245,66,.2)}
+.thumb img{width:100%;height:100%;object-fit:cover;filter:saturate(.85) contrast(1.1);transition:transform .3s}
+.sug{display:flex;gap:12px;padding:8px;cursor:pointer;transition:.2s;
+  background:rgba(15,22,15,.8);clip-path:polygon(10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%,0 10px);
+  border:1px solid rgba(200,245,66,.2)}
+.sug:hover{background:rgba(20,32,20,.95);border-color:var(--lime);box-shadow:0 0 10px rgba(200,245,66,.2)}
+.sug:hover img{transform:scale(1.08)}
+.sug:hover h4{color:var(--lime)}
+.dur{position:absolute;bottom:4px;right:6px;z-index:2;font:700 10px 'Space Mono',monospace;background:rgba(0,0,0,.9);color:var(--lime);padding:1px 5px;border:1px solid var(--lime)}
+.line-clamp-2{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.avatar{display:flex;align-items:center;justify-content:center;font:700 12px 'Orbitron',sans-serif;flex-shrink:0;
+  clip-path:polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%);border:1px solid var(--lime)}
+.stat-num{font:900 34px/1 'Orbitron',sans-serif;color:var(--lime);text-shadow:0 0 10px rgba(200,245,66,.4)}
+.bar-stripe{height:8px;background:repeating-linear-gradient(90deg,var(--orange) 0 6px,transparent 6px 10px);opacity:.8}
+.ch-row{display:flex;gap:12px;align-items:baseline;padding:5px 0;border-bottom:1px dashed rgba(200,245,66,.2);cursor:pointer;transition:.15s}
+.ch-row:hover{padding-left:6px;background:rgba(200,245,66,.1)}
+.ch-row .ts{color:var(--orange);font-weight:700;text-shadow:0 0 6px rgba(255,138,31,.5)}
+.cinput{background:transparent;border:0;border-bottom:1px solid var(--lime);color:var(--txt);transition:.2s}
+.cinput:focus{outline:none;border-bottom-color:var(--cyan);box-shadow:0 4px 8px -4px var(--cyan)}
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+<div class="horizon"></div>
+
+<div class="wrap flex flex-col min-h-screen">
+
+<!-- ===== TOP BAR ===== -->
+<header class="top px-4 h-14 flex items-center justify-between">
+  <div class="flex items-center gap-3">
+    <button class="iconbtn text-lg"><i class="fa-solid fa-bars"></i></button>
+    <a href="#" class="flex items-center gap-2">
+      <svg width="30" height="30" viewBox="0 0 32 32" aria-hidden="true">
+        <path d="M9 2h14l7 7v14l-7 7H9l-7-7V9z" fill="rgba(200,245,66,.15)" stroke="#c8f542" stroke-width="1.6"/>
+        <path d="M13 10.5v11l9-5.5z" fill="#c8f542"/>
+      </svg>
+      <span class="disp font-black text-xl"><span style="color:var(--lime)">Us</span><span class="text-white">Tube</span></span>
+      <span class="mono text-[9px] font-bold text-[var(--orange)] border border-[var(--orange)]/60 px-1 ml-1 tracking-widest">IN</span>
+    </a>
+  </div>
+
+  <div class="flex items-center flex-1 max-w-2xl mx-4">
+    <div class="searchbox">
+      <input type="text" value="An Introduction to Memory Editing concept movie editing timeline splicing" class="w-full bg-transparent text-sm text-white focus:outline-none placeholder-gray-500 mono">
+      <button class="text-gray-400 hover:text-[var(--lime)] ml-1"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <button class="searchbtn"><i class="fa-solid fa-magnifying-glass text-sm"></i></button>
+    <button class="iconbtn ml-2 bg-black/40 border border-[var(--lime)]/30" title="Search with voice"><i class="fa-solid fa-microphone text-sm"></i></button>
+  </div>
+
+  <div class="flex items-center gap-2">
+    <button id="create-modal-btn" class="btn-solid px-4 py-2 text-xs flex items-center gap-2 cursor-pointer">
+      <i class="fa-solid fa-plus"></i> CREATE
+    </button>
+    <button class="iconbtn"><i class="fa-regular fa-bell"></i><span class="absolute top-2.5 right-2.5 w-2 h-2 rounded-full bg-[var(--orange)]" style="box-shadow:0 0 6px var(--orange)"></span></button>
+    <div class="avatar w-9 h-9 cursor-pointer text-[#050806]" style="background:var(--orange);color:#fff">SD</div>
+  </div>
+</header>
+
+<!-- ===== UPLOAD MODAL ===== -->
+<div id="upload-modal" class="fixed inset-0 z-[90] bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
+  <div class="halo w-full max-w-lg">
+    <div class="hud" style="background:#0a100acc">
+      <div class="px-6 py-4 flex items-center justify-between border-b border-[var(--lime)]/30">
+        <h3 class="disp font-bold text-sm flex items-center gap-2"><span class="tick"></span><span style="color:var(--lime)">UPLOAD EXPLAINER VIDEO</span></h3>
+        <button id="close-upload-modal" class="iconbtn w-8 h-8"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="p-6 space-y-5 text-center">
+        <div class="relative group border border-dashed border-[var(--lime)] hover:border-[var(--cyan)] p-8 transition flex flex-col items-center bg-black/50 cursor-pointer">
+          <input type="file" id="modal-video-upload-input" accept="video/*" class="absolute inset-0 opacity-0 cursor-pointer">
+          <div class="avatar w-16 h-16 text-2xl mb-4 text-[#050806] group-hover:scale-110 transition" style="background:var(--lime)"><i class="fa-solid fa-arrow-up-from-bracket"></i></div>
+          <h4 class="font-bold text-sm text-white mb-1">Drag and drop memory editing explainer video</h4>
+          <p class="text-xs text-[var(--dim)] mb-4 mono">Upload Veo or custom rendered explainer files.</p>
+          <span class="btn-solid text-xs px-5 py-2.5 inline-block">SELECT EXPLAINER VIDEO</span>
+        </div>
+        <div id="modal-upload-status" class="text-xs text-[var(--dim)] mono bg-black/60 p-3 border border-[var(--lime)]/30">Current Status: Using default tutorial video (NeuraCraft Pro 14)</div>
+      </div>
+      <div class="px-6 py-3 bg-black/50 border-t border-[var(--lime)]/30 flex items-center justify-between text-xs">
+        <span class="text-[var(--dim)] mono">Nemosyne Cleanroom Secure Upload v4.8</span>
+        <button id="modal-reset-btn" class="pill hidden">Reset to Default</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MAIN ===== -->
+<main class="max-w-[1750px] w-full mx-auto p-3 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+  <!-- LEFT -->
+  <div class="lg:col-span-8 space-y-4 min-w-0">
+
+    <div class="halo" id="player-wrap">
+      <div id="video-container" class="hud vid group">
+        <div id="default-poster" class="absolute inset-0">
+          <img src="Gemini_Generated_Image_9w7xza9w7xza9w7x.png" alt="An Introduction to Memory Editing: NeuroCraft Pro 14" class="w-full h-full object-cover">
+        </div>
+        <video id="custom-video-player" class="absolute inset-0 w-full h-full object-cover hidden"></video>
+        <span class="bracket tl"></span><span class="bracket tr"></span><span class="bracket bl"></span><span class="bracket br"></span>
+
+        <div id="center-play-btn" class="absolute inset-0 z-10 flex items-center justify-center cursor-pointer bg-black/30 hover:bg-black/20 transition">
+          <div class="playbig"><i class="fa-solid fa-play ml-1"></i></div>
+        </div>
+
+        <div class="ctrl">
+          <div class="w-full mb-2"><input type="range" id="video-seekbar" min="0" max="100" value="0" step="0.1"></div>
+          <div class="flex items-center justify-between text-xs">
+            <div class="flex items-center gap-3">
+              <button id="yt-play-pause-btn" class="cbtn text-lg" title="Play"><i id="yt-play-icon" class="fa-solid fa-play"></i></button>
+              <button class="cbtn text-sm" title="Next"><i class="fa-solid fa-forward-step"></i></button>
+              <div class="flex items-center gap-2">
+                <button id="yt-mute-btn" class="cbtn text-sm" title="Mute"><i id="yt-volume-icon" class="fa-solid fa-volume-high"></i></button>
+                <input type="range" id="yt-volume-slider" min="0" max="1" step="0.05" value="1" class="!w-16">
+              </div>
+              <div class="mono text-[11px] text-[var(--lime)] select-none"><span id="current-time">00:00</span> / <span id="duration-time">10:45</span></div>
+            </div>
+            <div class="flex items-center gap-3 text-sm">
+              <button class="cbtn"><i class="fa-solid fa-toggle-on text-[var(--lime)] text-base"></i></button>
+              <button class="cbtn"><i class="fa-solid fa-closed-captioning"></i></button>
+              <button class="cbtn"><i class="fa-solid fa-gear"></i></button>
+              <button class="cbtn"><i class="fa-solid fa-clone"></i></button>
+              <button class="cbtn"><i class="fa-solid fa-tv"></i></button>
+              <button id="yt-fullscreen-btn" class="cbtn"><i class="fa-solid fa-expand"></i></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <h1 id="video-title-heading" class="disp text-lg sm:text-xl font-bold text-white pt-1 leading-snug">
+      NeuraCraft Pro 14: Step-by-Step Memory Re-Encoding Tutorial (Nemosyne Cleanroom Workflow)
+    </h1>
+
+    <!-- channel row -->
+    <div class="flex flex-wrap items-center justify-between gap-4 py-2">
+      <div class="flex items-center gap-3">
+        <div class="avatar w-11 h-11 text-sm text-[#050806]" style="background:var(--lime)">N</div>
+        <div>
+          <h3 class="font-bold text-sm text-white flex items-center gap-1.5 leading-none">Nemosyne Tech Academy
+            <i class="fa-solid fa-circle-check text-xs text-[var(--lime)]" title="Verified Defense Training Partner"></i></h3>
+          <p class="text-xs text-[var(--dim)] mt-1 mono">142K subscribers</p>
+        </div>
+        <button class="btn-solid text-xs px-5 py-2 ml-2">SUBSCRIBE</button>
+      </div>
+      <div class="flex items-center gap-2 flex-wrap">
+        <button class="pill"><i class="fa-regular fa-thumbs-up"></i> 18,420</button>
+        <button class="pill"><i class="fa-regular fa-thumbs-down"></i></button>
+        <button class="pill"><i class="fa-solid fa-share"></i> Share</button>
+        <button class="pill"><i class="fa-solid fa-arrow-down"></i> Download</button>
+        <button class="pill !px-3"><i class="fa-solid fa-ellipsis"></i></button>
+      </div>
+    </div>
+
+    <!-- DESCRIPTION HUD -->
+    <div class="halo or">
+      <div class="hud or p-5 space-y-4" style="background:#140c06dd">
+        <div class="flex flex-wrap items-end gap-x-8 gap-y-3">
+          <div><div class="stat-num" style="color:var(--orange);text-shadow:0 0 10px rgba(255,138,31,.4)">428,102</div><div class="hud-label or mt-1">Views</div></div>
+          <div><div class="stat-num" style="color:var(--orange);text-shadow:0 0 10px rgba(255,138,31,.4)">OCT 08</div><div class="hud-label or mt-1">2026</div></div>
+          <div class="mono text-[11px] text-[var(--cyan)] leading-relaxed">#MemoryEditing #MovieEditing<br>#NeuraCraft #Nemosyne</div>
+        </div>
+        <div class="bar-stripe"></div>
+        <div>
+          <div class="hud-label mb-2">&gt;&gt; Description:</div>
+          <p class="text-sm leading-relaxed text-[var(--txt)]">
+            An immersive explainer video demonstrating how memory editing works by drawing direct parallels to professional movie editing. Learn how memory timelines are scrubbed, non-compliant autobiographical clips are cleanly cut with razor tools, and alternative cinematic footage is spliced in using NeuraCraft Pro 14 and EmotionGrade v8.
+          </p>
+        </div>
+        <div>
+          <div class="hud-label li mb-2"><span class="tick"></span>Chapter Stamps</div>
+          <div class="mono text-xs">
+            <div class="ch-row" data-t="0"><span class="ts">[00:00]</span><span class="text-[var(--dim)]">The Concept of Memory as a Film Reel</span></div>
+            <div class="ch-row" data-t="105"><span class="ts">[01:45]</span><span class="text-[var(--dim)]">Timeline Scrubbing &amp; Razor Tool Cuts</span></div>
+            <div class="ch-row" data-t="250"><span class="ts">[04:10]</span><span class="text-[var(--dim)]">Splicing Alternative Footage in NeuraCraft Pro 14</span></div>
+            <div class="ch-row" data-t="440"><span class="ts">[07:20]</span><span class="text-[var(--dim)]">Affective Curve Grading with EmotionGrade v8</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- COMMENTS -->
+    <div class="pt-3 space-y-4">
+      <div class="flex items-center gap-6">
+        <h3 class="disp font-bold text-base"><span style="color:var(--lime)">248</span> COMMENTS</h3>
+        <button class="flex items-center gap-2 text-xs font-semibold text-[var(--dim)] hover:text-[var(--lime)]"><i class="fa-solid fa-bars-staggered"></i> Sort by</button>
+      </div>
+      <div class="flex items-start gap-3">
+        <div class="avatar w-10 h-10 text-xs text-[#050806]" style="background:var(--orange)">SD</div>
+        <div class="flex-1"><input type="text" placeholder="Add a comment..." class="cinput w-full pb-1 text-sm mono"></div>
+      </div>
+      <div class="space-y-3">
+        <div class="halo cy"><div class="hud cy sm flex items-start gap-3 p-4 text-sm" style="background:#061418dd">
+          <div class="avatar w-9 h-9 text-xs text-[#050806]" style="background:var(--lime)">AK</div>
+          <div class="space-y-1 min-w-0">
+            <div class="flex items-center gap-2 flex-wrap"><span class="font-bold text-white">Anand Kumar (Senior Editor, Nemosyne)</span><span class="text-[var(--dim)] text-[11px] mono">2 hours ago</span></div>
+            <p class="text-[var(--txt)] leading-relaxed">Explaining memory editing through the lens of non-linear film cutting is the best onboarding metaphor yet. Watching the razor tool slice the autobiographical track at <span class="text-[var(--orange)] mono">01:45</span> made it click instantly for our new interns!</p>
+          </div>
+        </div></div>
+        <div class="halo cy"><div class="hud cy sm flex items-start gap-3 p-4 text-sm" style="background:#061418dd">
+          <div class="avatar w-9 h-9 text-xs text-[#050806]" style="background:var(--cyan)">PM</div>
+          <div class="space-y-1 min-w-0">
+            <div class="flex items-center gap-2"><span class="font-bold text-white">Pooja Mishra</span><span class="text-[var(--dim)] text-[11px] mono">5 hours ago</span></div>
+            <p class="text-[var(--txt)] leading-relaxed">The transition from conceptualizing memories as film reels directly into NeuraCraft Pro 14 workflows is seamless. Incredible explainer video!</p>
+          </div>
+        </div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT SIDEBAR -->
+  <div class="lg:col-span-4 space-y-3 min-w-0">
+    <div class="flex items-center gap-2 overflow-x-auto pb-1">
+      <span class="chip on">All</span><span class="chip">Memory Editing</span><span class="chip">Movie Analogy</span><span class="chip">NeuraCraft Pro</span>
+    </div>
+
+    <div class="hud-label li pt-1"><span class="tick"></span>Up Next</div>
+
+    <div class="sug group"><div class="thumb"><img src="Gemini_Generated_Image_9w7xza9w7xza9w7x.png" alt="Memory Splicing"><span class="dur">06:12</span></div>
+      <div class="space-y-1 text-xs min-w-0"><h4 class="font-bold text-white line-clamp-2 transition">Why Memory Editing Feels Exactly Like Adobe Premiere Pro</h4><p class="text-[var(--dim)] text-[11px]">Cinematic Cognition ✓</p><p class="text-[var(--dim)] text-[11px] mono">215K views • 2 days ago</p></div></div>
+
+    <div class="sug group"><div class="thumb"><img src="https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=320&auto=format&fit=crop&q=80" alt="Timeline Cutting"><span class="dur">09:45</span></div>
+      <div class="space-y-1 text-xs min-w-0"><h4 class="font-bold text-white line-clamp-2 transition">Cutting and Replacing Autobiographical Memories: A Masterclass</h4><p class="text-[var(--dim)] text-[11px]">Nemosyne Tech Academy</p><p class="text-[var(--dim)] text-[11px] mono">98K views • 1 week ago</p></div></div>
+
+    <div class="sug group"><div class="thumb"><img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=320&auto=format&fit=crop&q=80" alt="EmotionGrade"><span class="dur">11:30</span></div>
+      <div class="space-y-1 text-xs min-w-0"><h4 class="font-bold text-white line-clamp-2 transition">Using EmotionGrade v8 for Cinematic Emotional Color Grading</h4><p class="text-[var(--dim)] text-[11px]">Bio-Somatic Post Lab</p><p class="text-[var(--dim)] text-[11px] mono">142K views • 2 weeks ago</p></div></div>
+
+    <div class="sug group"><div class="thumb"><img src="https://images.unsplash.com/photo-1518770660439-4636190af475?w=320&auto=format&fit=crop&q=80" alt="Ghost Clips"><span class="dur">05:20</span></div>
+      <div class="space-y-1 text-xs min-w-0"><h4 class="font-bold text-white line-clamp-2 transition">Avoiding Artifacts When Splicing Alternative Footage into Synapses</h4><p class="text-[var(--dim)] text-[11px]">Cleanroom Engineers</p><p class="text-[var(--dim)] text-[11px] mono">64K views • 3 weeks ago</p></div></div>
+
+    <div class="sug group"><div class="thumb"><img src="https://images.unsplash.com/photo-1450133064473-71024230f91b?w=320&auto=format&fit=crop&q=80" alt="Film Reel Memory"><span class="dur">14:10</span></div>
+      <div class="space-y-1 text-xs min-w-0"><h4 class="font-bold text-white line-clamp-2 transition">The Psychology of Cinematic Memory Re-Encoding</h4><p class="text-[var(--dim)] text-[11px]">Neural Cinema Journal</p><p class="text-[var(--dim)] text-[11px] mono">189K views • 1 month ago</p></div></div>
+
+    <div class="sug group"><div class="thumb"><img src="https://images.unsplash.com/photo-1563986768609-322da13575f3?w=320&auto=format&fit=crop&q=80" alt="Job Interview"><span class="dur">08:50</span></div>
+      <div class="space-y-1 text-xs min-w-0"><h4 class="font-bold text-white line-clamp-2 transition">Cracking the Nemosyne Memory Editor Practical Interview Test</h4><p class="text-[var(--dim)] text-[11px]">GetJob Career Prep</p><p class="text-[var(--dim)] text-[11px] mono">76K views • 1 month ago</p></div></div>
+
+    <div class="sug group"><div class="thumb"><img src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=320&auto=format&fit=crop&q=80" alt="Workflow speed"><span class="dur">12:15</span></div>
+      <div class="space-y-1 text-xs min-w-0"><h4 class="font-bold text-white line-clamp-2 transition">Speed Up Your Cleanroom Render Times in NeuraCraft Pro 14</h4><p class="text-[var(--dim)] text-[11px]">Nemosyne Power Users</p><p class="text-[var(--dim)] text-[11px] mono">52K views • 1 month ago</p></div></div>
+
+    <div class="sug group"><div class="thumb"><img src="https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?w=320&auto=format&fit=crop&q=80" alt="Salary Breakdown"><span class="dur">10:05</span></div>
+      <div class="space-y-1 text-xs min-w-0"><h4 class="font-bold text-white line-clamp-2 transition">Salary &amp; Benefits for Memory Editors in Bengaluru Cleanrooms</h4><p class="text-[var(--dim)] text-[11px]">Tech Careers India</p><p class="text-[var(--dim)] text-[11px] mono">112K views • 2 months ago</p></div></div>
+
+    <div class="sug group"><div class="thumb"><img src="https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?w=320&auto=format&fit=crop&q=80" alt="Before and After"><span class="dur">16:30</span></div>
+      <div class="space-y-1 text-xs min-w-0"><h4 class="font-bold text-white line-clamp-2 transition">Before &amp; After: Inmate Memory Splicing Case Studies</h4><p class="text-[var(--dim)] text-[11px]">Cognitive Defense Network</p><p class="text-[var(--dim)] text-[11px] mono">134K views • 2 months ago</p></div></div>
+
+    <div class="sug group"><div class="thumb"><img src="https://images.unsplash.com/photo-1497366216548-37526070297c?w=320&auto=format&fit=crop&q=80" alt="Editing Suite"><span class="dur">07:10</span></div>
+      <div class="space-y-1 text-xs min-w-0"><h4 class="font-bold text-white line-clamp-2 transition">Inside a Nemosyne Cleanroom: Hardware &amp; Software Setup</h4><p class="text-[var(--dim)] text-[11px]">Future Workspace India</p><p class="text-[var(--dim)] text-[11px] mono">88K views • 2 months ago</p></div></div>
+  </div>
+</main>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded',()=>{
+  const $=id=>document.getElementById(id);
+  const createBtn=$('create-modal-btn'),uploadModal=$('upload-modal'),closeUploadModal=$('close-upload-modal'),
+    modalFileInput=$('modal-video-upload-input'),modalUploadStatus=$('modal-upload-status'),modalResetBtn=$('modal-reset-btn'),
+    defaultPoster=$('default-poster'),customPlayer=$('custom-video-player'),centerPlayBtn=$('center-play-btn'),
+    ytPlayPauseBtn=$('yt-play-pause-btn'),ytPlayIcon=$('yt-play-icon'),videoSeekbar=$('video-seekbar'),
+    currentTimeEl=$('current-time'),durationTimeEl=$('duration-time'),ytMuteBtn=$('yt-mute-btn'),
+    ytVolumeIcon=$('yt-volume-icon'),ytVolumeSlider=$('yt-volume-slider'),ytFullscreenBtn=$('yt-fullscreen-btn'),
+    videoContainer=$('video-container'),playerWrap=$('player-wrap'),videoTitleHeading=$('video-title-heading');
+
+  let isCustomVideo=false,fakePlaying=false;
+  const DEFAULT_TITLE=videoTitleHeading.textContent.trim();
+  const fmt=s=>{s=Math.max(0,s||0);const m=Math.floor(s/60),x=Math.floor(s%60);return `${String(m).padStart(2,'0')}:${String(x).padStart(2,'0')}`;};
+
+  function setPlaying(p){
+    ytPlayIcon.className=p?'fa-solid fa-pause':'fa-solid fa-play';
+    centerPlayBtn.classList.toggle('hidden',p);
+    videoContainer.classList.toggle('playing',p);
+  }
+
+  createBtn.addEventListener('click',()=>uploadModal.classList.remove('hidden'));
+  closeUploadModal.addEventListener('click',()=>uploadModal.classList.add('hidden'));
+  uploadModal.addEventListener('click',e=>{if(e.target===uploadModal)uploadModal.classList.add('hidden');});
+
+  modalFileInput.addEventListener('change',e=>{
+    const file=e.target.files[0];if(!file)return;
+    if(customPlayer.src)URL.revokeObjectURL(customPlayer.src);
+    customPlayer.src=URL.createObjectURL(file);
+    customPlayer.classList.remove('hidden');defaultPoster.classList.add('hidden');
+    isCustomVideo=true;customPlayer.play().catch(()=>{});setPlaying(true);
+    modalUploadStatus.textContent=`Loaded successfully: ${file.name}`;
+    modalUploadStatus.style.color='var(--lime)';
+    modalResetBtn.classList.remove('hidden');
+    videoTitleHeading.textContent='An Introduction to Memory Editing: NeuroCraft Pro 14';
+    uploadModal.classList.add('hidden');
+  });
+
+  function resetToDefault(){
+    customPlayer.pause();customPlayer.removeAttribute('src');customPlayer.load();
+    customPlayer.classList.add('hidden');defaultPoster.classList.remove('hidden');
+    isCustomVideo=false;setPlaying(false);
+    videoSeekbar.value=0;currentTimeEl.textContent='00:00';durationTimeEl.textContent='10:45';
+    modalFileInput.value='';
+    modalUploadStatus.textContent='Current Status: Using default tutorial video (NeuraCraft Pro 14)';
+    modalUploadStatus.style.color='';
+    modalResetBtn.classList.add('hidden');
+    videoTitleHeading.textContent=DEFAULT_TITLE;
+  }
+  modalResetBtn.addEventListener('click',resetToDefault);
+
+  function togglePlayPause(){
+    if(!isCustomVideo){fakePlaying=!fakePlaying;setPlaying(fakePlaying);return;}
+    if(customPlayer.paused){customPlayer.play();setPlaying(true);}else{customPlayer.pause();setPlaying(false);}
+  }
+  ytPlayPauseBtn.addEventListener('click',togglePlayPause);
+  centerPlayBtn.addEventListener('click',togglePlayPause);
+  customPlayer.addEventListener('click',togglePlayPause);
+  customPlayer.addEventListener('ended',()=>setPlaying(false));
+
+  customPlayer.addEventListener('timeupdate',()=>{
+    if(!isNaN(customPlayer.duration)){
+      const pr=(customPlayer.currentTime/customPlayer.duration)*100;
+      videoSeekbar.value=pr;
+      currentTimeEl.textContent=fmt(customPlayer.currentTime);durationTimeEl.textContent=fmt(customPlayer.duration);
+    }
+  });
+  customPlayer.addEventListener('loadedmetadata',()=>{durationTimeEl.textContent=fmt(customPlayer.duration);});
+  videoSeekbar.addEventListener('input',e=>{
+    if(isCustomVideo&&!isNaN(customPlayer.duration))customPlayer.currentTime=(e.target.value/100)*customPlayer.duration;
+  });
+
+  document.querySelectorAll('.ch-row').forEach(r=>r.addEventListener('click',()=>{
+    if(isCustomVideo&&!isNaN(customPlayer.duration))customPlayer.currentTime=Math.min(+r.dataset.t,customPlayer.duration);
+    window.scrollTo({top:0,behavior:'smooth'});
+  }));
+
+  function volIcon(){
+    ytVolumeIcon.className=(customPlayer.muted||customPlayer.volume==0)?'fa-solid fa-volume-xmark':customPlayer.volume<0.5?'fa-solid fa-volume-low':'fa-solid fa-volume-high';
+  }
+  ytMuteBtn.addEventListener('click',()=>{
+    customPlayer.muted=!customPlayer.muted;
+    ytVolumeSlider.value=customPlayer.muted?0:customPlayer.volume;volIcon();
+  });
+  ytVolumeSlider.addEventListener('input',e=>{
+    customPlayer.volume=e.target.value;customPlayer.muted=(+e.target.value===0);volIcon();
+  });
+
+  ytFullscreenBtn.addEventListener('click',()=>{
+    if(!document.fullscreenElement)playerWrap.requestFullscreen().catch(()=>{});else document.exitFullscreen();
+  });
+});
+</script>
+</body>
+</html>

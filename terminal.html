@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Windows Terminal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Cascadia+Code:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #0c0c0c;
+            color: #cccccc;
+            font-family: 'Cascadia Code', Consolas, Courier New, monospace;
+            overflow-x: hidden;
+        }
+
+        .terminal-glow {
+            text-shadow: 0 0 4px rgba(204, 204, 204, 0.2);
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        .highlight-num {
+            color: #00ff66;
+            font-size: 2.25rem;
+            font-weight: bold;
+            text-shadow: 0 0 15px rgba(0, 255, 102, 0.8);
+            animation: blink 1s infinite;
+            display: inline-block;
+            vertical-align: middle;
+            margin: 0 0.2em;
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4 sm:p-8 flex flex-col justify-between selection:bg-[#333333] selection:text-white">
+
+    <main class="max-w-4xl w-full mx-auto space-y-4 terminal-glow">
+        
+        <!-- Command Prompt Line -->
+        <div class="flex items-center space-x-2 text-sm sm:text-base text-white">
+            <span class="text-[#3b82f6] font-bold">C:\Users\User01&gt;</span>
+            <span class="text-white">surveillance-query --check-active-nodes</span>
+        </div>
+
+        <!-- Terminal Output -->
+        <div class="space-y-3 pt-2 text-sm sm:text-base text-[#cccccc]">
+            <div class="text-zinc-500">[!] Initializing low-level system inspection...</div>
+            <div class="text-zinc-500">[!] Resolving anonymous proxy streams...</div>
+            <div class="text-emerald-400 font-semibold">&gt; Scanning active kernel handles and hidden socket connections...</div>
+            
+            <div class="py-2 flex items-center flex-wrap">
+                <span>&gt; Active entities monitoring your system right now:</span> <span class="highlight-num">5</span>
+            </div>
+
+            <div class="text-xs sm:text-sm space-y-1 text-zinc-400 pl-4 border-l border-zinc-700 font-mono">
+                <div>[01] PID 4096 — UNKNOWN_ORIGIN // SECURE_PORT_01 (Reading Memory Cache)</div>
+                <div>[02] PID 5112 — REMOTE_DAEMON // ANONYMOUS_LISTENER</div>
+                <div>[03] PID 6044 — DEEP_HOOK // KERNEL_LEVEL_OBSERVER</div>
+                <div>[04] PID 8820 — PROXY_VECTOR // UNRESOLVED_IP_STREAM</div>
+                <div>[05] PID 9901 — SYNC_DAEMON // SILENT_FEED</div>
+            </div>
+
+            <div class="text-red-500 font-semibold pt-2">&gt; Warning: Active observers detected. Do not disconnect.</div>
+        </div>
+
+        <!-- Next Prompting Line -->
+        <div class="flex items-center space-x-2 text-sm sm:text-base pt-4">
+            <span class="text-[#3b82f6] font-bold">C:\Users\User01&gt;</span>
+            <span class="inline-block w-2.5 h-5 bg-white animate-pulse"></span>
+        </div>
+
+    </main>
+
+    <footer class="max-w-4xl w-full mx-auto text-xs text-zinc-600 font-mono pt-8">
+        Windows Terminal [Version 10.2055.489.0]
+    </footer>
+
+</body>
+</html>

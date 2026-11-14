@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>r/Conspiracy - The memory-rewriting tech isn't just in cleanrooms anymore...</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', 'Helvetica', 'Arial', 'sans-serif'],
+                        mono: ['SFMono-Regular', 'Consolas', '"Liberation Mono"', 'Menlo', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background-color: #030303;
+            color: #d7dadc;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+        .reddit-card {
+            background-color: #1a1a1b;
+            border: 1px solid #343536;
+            border-radius: 4px;
+        }
+        .reddit-card:hover {
+            border-color: #818384;
+        }
+        .vote-btn:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+<body class="min-h-screen text-slate-200 pb-12">
+
+    <!-- Reddit Header Navigation -->
+    <header class="bg-[#1a1a1b] border-b border-[#343536] sticky top-0 z-50 px-4 h-12 flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+            <div class="flex items-center space-x-2 cursor-pointer">
+                <div class="w-8 h-8 rounded-full bg-orange-600 flex items-center justify-center font-bold text-white text-lg">r/</div>
+                <span class="font-bold text-white text-base tracking-tight">r/Conspiracy</span>
+            </div>
+        </div>
+
+        <div class="flex-1 max-w-xl mx-6 hidden md:block">
+            <div class="relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                    <i class="fa-solid fa-magnifying-glass text-xs"></i>
+                </span>
+                <input type="text" placeholder="Search Reddit" class="w-full bg-[#272729] text-slate-200 text-xs rounded-full pl-9 pr-4 py-2 border border-transparent focus:border-slate-500 focus:outline-none">
+            </div>
+        </div>
+
+        <div class="flex items-center space-x-3">
+            <button class="bg-[#ff4500] hover:bg-[#e03d00] text-white text-xs font-bold px-4 py-1.5 rounded-full transition">Log In</button>
+            <button class="bg-[#272729] hover:bg-[#343536] text-slate-200 text-xs font-bold px-4 py-1.5 rounded-full border border-slate-600 transition">Sign Up</button>
+        </div>
+    </header>
+
+    <!-- Main Reddit Container -->
+    <main class="max-w-[1000px] mx-auto px-4 mt-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- Post & Comments Section -->
+        <div class="lg:col-span-8 space-y-4">
+            
+            <!-- Main Thread Card -->
+            <div class="reddit-card p-4 flex gap-3 relative">
+                
+                <!-- Voting Column -->
+                <div class="flex flex-col items-center justify-start space-y-1 text-slate-400 w-8 select-none">
+                    <button class="vote-btn p-1 rounded hover:text-orange-500 transition"><i class="fa-solid fa-arrow-up text-sm"></i></button>
+                    <span class="font-bold text-xs text-slate-200">3.8k</span>
+                    <button class="vote-btn p-1 rounded hover:text-blue-500 transition"><i class="fa-solid fa-arrow-down text-sm"></i></button>
+                </div>
+
+                <!-- Post Content -->
+                <div class="flex-1 space-y-3">
+                    <div class="flex items-center space-x-2 text-xs text-slate-400">
+                        <span class="font-bold text-slate-200 hover:underline cursor-pointer">r/conspiracy</span>
+                        <span>•</span>
+                        <span>Posted by <span class="hover:underline cursor-pointer">u/SynapseWatcher_2055</span> 4 hours ago</span>
+                        <span class="bg-orange-900/40 text-orange-400 border border-orange-500/30 text-[10px] px-1.5 py-0.2 rounded font-mono">2055 CONSPIRACY</span>
+                    </div>
+
+                    <h1 class="text-lg sm:text-xl font-bold text-slate-100 leading-snug">
+                        The memory-rewriting tech isn't just in cleanrooms anymore. They are field-testing it on normal citizens, and we wouldn't even know if our memories were wiped or replaced.
+                    </h1>
+
+                    <!-- Shorter Rant Body -->
+                    <div class="text-sm text-slate-300 space-y-3 leading-relaxed pt-1">
+                        <p>
+                            Everyone is talking about the 2055 Penal Memory Act and how horrifying it is that prisons are forcibly rewriting inmates' timelines for combat. But you're missing the bigger picture.
+                        </p>
+                        <p>
+                            Do you really think rogue contractors and shadow groups waited for government approval to test portable timeline-editing arrays in the wild? Why use a monitored cleanroom when you can test weaponized memory-wiping algorithms on the public with zero paper trail?
+                        </p>
+                        <p class="text-orange-400 font-bold">
+                            Think about it: How would you ever know if your own memory was altered last Tuesday?
+                        </p>
+                        <p>
+                            If a localized neural pulse wipes a three-hour window or replaces a disturbing encounter with a fabricated memory, your brain just stitches the narrative together. You look at your clock, rationalize the brain fog, and move on. Have you had any weird timeline gaps lately?
+                        </p>
+                    </div>
+
+                    <!-- Post Actions Footer -->
+                    <div class="flex items-center space-x-4 text-xs font-bold text-slate-400 pt-3">
+                        <button class="flex items-center space-x-1.5 bg-[#272729] hover:bg-[#343536] px-3 py-1.5 rounded transition">
+                            <i class="fa-regular fa-comment text-sm"></i>
+                            <span>12 Comments</span>
+                        </button>
+                        <button class="flex items-center space-x-1.5 bg-[#272729] hover:bg-[#343536] px-3 py-1.5 rounded transition">
+                            <i class="fa-solid fa-share text-sm"></i>
+                            <span>Share</span>
+                        </button>
+                        <button class="flex items-center space-x-1.5 bg-[#272729] hover:bg-[#343536] px-3 py-1.5 rounded transition">
+                            <i class="fa-regular fa-bookmark text-sm"></i>
+                            <span>Save</span>
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Comment Box Input Simulation -->
+            <div class="reddit-card p-4 space-y-2">
+                <div class="text-xs text-slate-400">Comment as <span class="text-slate-200 font-bold">Anonymous_User</span></div>
+                <textarea rows="3" placeholder="What are your thoughts?" class="w-full bg-[#272729] text-slate-200 text-sm p-3 rounded border border-[#343536] focus:border-slate-500 focus:outline-none"></textarea>
+                <div class="flex justify-end">
+                    <button class="bg-[#ff4500] hover:bg-[#e03d00] text-white text-xs font-bold px-4 py-1.5 rounded-full transition">Comment</button>
+                </div>
+            </div>
+
+            <!-- Expanded Comments Thread List with Nested Replies -->
+            <div class="space-y-3 pt-2">
+                
+                <!-- Comment 1 -->
+                <div class="reddit-card p-4 space-y-2">
+                    <div class="flex items-center justify-between text-xs text-slate-400">
+                        <div class="flex items-center space-x-2">
+                            <div class="w-6 h-6 rounded-full bg-cyan-700 flex items-center justify-center font-bold text-white text-[10px]">NG</div>
+                            <span class="font-bold text-slate-200">u/NeuralGlitch_88</span>
+                            <span>•</span>
+                            <span>3 hours ago</span>
+                        </div>
+                    </div>
+                    <p class="text-sm text-slate-300 pl-8 leading-relaxed">
+                        Bro, delete this post right now. Seriously. A few weeks ago, I woke up with a complete two-day blank spot in October. Went to my local clinic, ran a routine diagnostic scan just to check for synaptic scarring, and the local doc acted like I was insane for asking. If cleanroom tech is on the black market, normal civilians are definitely the guinea pigs.
+                    </p>
+                    <div class="flex items-center space-x-4 text-xs font-bold text-slate-400 pl-8 pt-1">
+                        <div class="flex items-center space-x-1">
+                            <button class="hover:text-orange-500"><i class="fa-solid fa-arrow-up"></i></button>
+                            <span class="text-slate-200">412</span>
+                            <button class="hover:text-blue-500"><i class="fa-solid fa-arrow-down"></i></button>
+                        </div>
+                        <button class="hover:text-slate-200">Reply</button>
+                        <button class="hover:text-slate-200">Share</button>
+                    </div>
+
+                    <!-- Nested Reply 1.1 -->
+                    <div class="ml-6 pl-4 border-l-2 border-slate-700 mt-3 space-y-2 pt-2">
+                        <div class="flex items-center justify-between text-xs text-slate-400">
+                            <div class="flex items-center space-x-2">
+                                <div class="w-5 h-5 rounded-full bg-indigo-600 flex items-center justify-center font-bold text-white text-[9px]">SW</div>
+                                <span class="font-bold text-slate-200">u/SynapseWatcher_2055</span> <span class="bg-orange-900/40 text-orange-400 text-[9px] px-1 rounded">OP</span>
+                                <span>•</span>
+                                <span>2 hours ago</span>
+                            </div>
+                        </div>
+                        <p class="text-xs text-slate-300 pl-7 leading-relaxed">
+                            That clinic response is the exact red flag I'm talking about. Local doctors have protocols to stonewall patients asking about synaptic scarring. They're mandated to protect the data sweeps.
+                        </p>
+                        <div class="flex items-center space-x-4 text-xs font-bold text-slate-400 pl-7 pt-1">
+                            <div class="flex items-center space-x-1">
+                                <button class="hover:text-orange-500"><i class="fa-solid fa-arrow-up"></i></button>
+                                <span class="text-slate-200">89</span>
+                                <button class="hover:text-blue-500"><i class="fa-solid fa-arrow-down"></i></button>
+                            </div>
+                            <button class="hover:text-slate-200">Reply</button>
+                        </div>
+
+                        <!-- Nested Reply 1.1.1 -->
+                        <div class="ml-6 pl-4 border-l-2 border-slate-700 mt-2 space-y-2 pt-2">
+                            <div class="flex items-center justify-between text-xs text-slate-400">
+                                <div class="flex items-center space-x-2">
+                                    <div class="w-5 h-5 rounded-full bg-cyan-700 flex items-center justify-center font-bold text-white text-[9px]">NG</div>
+                                    <span class="font-bold text-slate-200">u/NeuralGlitch_88</span>
+                                    <span>•</span>
+                                    <span>1 hour ago</span>
+                                </div>
+                            </div>
+                            <p class="text-xs text-slate-300 pl-7 leading-relaxed">
+                                God, that makes my stomach turn. I'm literally packing a Faraday bag for my phone right now.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Comment 2 -->
+                <div class="reddit-card p-4 space-y-2">
+                    <div class="flex items-center justify-between text-xs text-slate-400">
+                        <div class="flex items-center space-x-2">
+                            <div class="w-6 h-6 rounded-full bg-purple-700 flex items-center justify-center font-bold text-white text-[10px]">TS</div>
+                            <span class="font-bold text-slate-200">u/TruthSeeker_MUM</span>
+                            <span>•</span>
+                            <span>2 hours ago</span>
+                        </div>
+                    </div>
+                    <p class="text-sm text-slate-300 pl-8 leading-relaxed">
+                        It explains the massive spike in "Ghost Memory Syndrome" symptoms reported by people who haven't even been near a correctional facility. People are walking around experiencing phantom panic attacks and dissociation because their subconscious is rejecting spliced timelines they didn't consent to.
+                    </p>
+                    <div class="flex items-center space-x-4 text-xs font-bold text-slate-400 pl-8 pt-1">
+                        <div class="flex items-center space-x-1">
+                            <button class="hover:text-orange-500"><i class="fa-solid fa-arrow-up"></i></button>
+                            <span class="text-slate-200">289</span>
+                            <button class="hover:text-blue-500"><i class="fa-solid fa-arrow-down"></i></button>
+                        </div>
+                        <button class="hover:text-slate-200">Reply</button>
+                        <button class="hover:text-slate-200">Share</button>
+                    </div>
+
+                    <!-- Nested Reply 2.1 -->
+                    <div class="ml-6 pl-4 border-l-2 border-slate-700 mt-3 space-y-2 pt-2">
+                        <div class="flex items-center justify-between text-xs text-slate-400">
+                            <div class="flex items-center space-x-2">
+                                <div class="w-5 h-5 rounded-full bg-pink-700 flex items-center justify-center font-bold text-white text-[9px]">AX</div>
+                                <span class="font-bold text-slate-200">u/BioEthicsDropout</span>
+                                <span>•</span>
+                                <span class="text-slate-500">1 hour ago</span>
+                            </div>
+                        </div>
+                        <p class="text-xs text-slate-300 pl-7 leading-relaxed">
+                            Can confirm. I interned at a bio-tech lab in Bengaluru last summer. The somatic rejection loops are real. When the synthetic narrative doesn't match baseline sensory data, the hippocampus literally micro-seizes.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Comment 3 -->
+                <div class="reddit-card p-4 space-y-2">
+                    <div class="flex items-center justify-between text-xs text-slate-400">
+                        <div class="flex items-center space-x-2">
+                            <div class="w-6 h-6 rounded-full bg-emerald-700 flex items-center justify-center font-bold text-white text-[10px]">GT</div>
+                            <span class="font-bold text-slate-200">u/GhostInTheTimeline</span>
+                            <span>•</span>
+                            <span>1 hour ago</span>
+                        </div>
+                    </div>
+                    <p class="text-sm text-slate-300 pl-8 leading-relaxed">
+                        OP is hitting on something huge. Think about how lucrative this is. If bad actors can weaponize memory editing to fabricate mass compliance or erase incriminating evidence from civilian witnesses, why leave it locked in government labs? The tech leaked the moment the first media grads started pulling ₹50,000,000 LPA salaries to edit human lives with a mouse click. Someone sold the source code.
+                    </p>
+                    <div class="flex items-center space-x-4 text-xs font-bold text-slate-400 pl-8 pt-1">
+                        <div class="flex items-center space-x-1">
+                            <button class="hover:text-orange-500"><i class="fa-solid fa-arrow-up"></i></button>
+                            <span class="text-slate-200">156</span>
+                            <button class="hover:text-blue-500"><i class="fa-solid fa-arrow-down"></i></button>
+                        </div>
+                        <button class="hover:text-slate-200">Reply</button>
+                        <button class="hover:text-slate-200">Share</button>
+                    </div>
+                </div>
+
+                <!-- Comment 4 -->
+                <div class="reddit-card p-4 space-y-2">
+                    <div class="flex items-center justify-between text-xs text-slate-400">
+                        <div class="flex items-center space-x-2">
+                            <div class="w-6 h-6 rounded-full bg-amber-700 flex items-center justify-center font-bold text-white text-[10px]">SM</div>
+                            <span class="font-bold text-slate-200">u/ScepticalMindset</span>
+                            <span>•</span>
+                            <span>45 minutes ago</span>
+                        </div>
+                    </div>
+                    <p class="text-sm text-slate-300 pl-8 leading-relaxed">
+                        As terrifying as this sounds, let's pump the brakes. There's a massive technological difference between a somatic chair in a high-security Bengaluru cleanroom and a portable neural array. You can't just beam memory edits into someone's head from a distance... right? <em>Right?</em><br>
+                        <span class="text-slate-500 italic text-xs mt-1 block">(Edit: Why did my comment just auto-edit itself? I didn't type that last sentence.)</span>
+                    </p>
+                    <div class="flex items-center space-x-4 text-xs font-bold text-slate-400 pl-8 pt-1">
+                        <div class="flex items-center space-x-1">
+                            <button class="hover:text-orange-500"><i class="fa-solid fa-arrow-up"></i></button>
+                            <span class="text-slate-200">92</span>
+                            <button class="hover:text-blue-500"><i class="fa-solid fa-arrow-down"></i></button>
+                        </div>
+                        <button class="hover:text-slate-200">Reply</button>
+                        <button class="hover:text-slate-200">Share</button>
+                    </div>
+
+                    <!-- Nested Reply 4.1 -->
+                    <div class="ml-6 pl-4 border-l-2 border-slate-700 mt-3 space-y-2 pt-2">
+                        <div class="flex items-center justify-between text-xs text-slate-400">
+                            <div class="flex items-center space-x-2">
+                                <div class="w-5 h-5 rounded-full bg-red-800 flex items-center justify-center font-bold text-white text-[9px]">404</div>
+                                <span class="font-bold text-slate-200">u/NullPointer_Exception</span>
+                                <span>•</span>
+                                <span class="text-slate-500">30 mins ago</span>
+                            </div>
+                        </div>
+                        <p class="text-xs text-slate-300 pl-7 leading-relaxed">
+                            Bro... that edit timestamp on your comment is wild. Look at the server logs. You didn't edit it, an automated script injected it. Get off the grid.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Comment 5 -->
+                <div class="reddit-card p-4 space-y-2">
+                    <div class="flex items-center justify-between text-xs text-slate-400">
+                        <div class="flex items-center space-x-2">
+                            <div class="w-6 h-6 rounded-full bg-rose-700 flex items-center justify-center font-bold text-white text-[10px]">CY</div>
+                            <span class="font-bold text-slate-200">u/CyberParanoid_99</span>
+                            <span>•</span>
+                            <span>30 minutes ago</span>
+                        </div>
+                    </div>
+                    <p class="text-sm text-slate-300 pl-8 leading-relaxed">
+                        Look at public transit surveillance logs in Mumbai or Geneva. Notice how entire crowds sometimes freeze or alter their walking paths simultaneously for a fraction of a second? Subliminal neural triggers or localized broadcast pulses. We are already being farmed for data.
+                    </p>
+                    <div class="flex items-center space-x-4 text-xs font-bold text-slate-400 pl-8 pt-1">
+                        <div class="flex items-center space-x-1">
+                            <button class="hover:text-orange-500"><i class="fa-solid fa-arrow-up"></i></button>
+                            <span class="text-slate-200">74</span>
+                            <button class="hover:text-blue-500"><i class="fa-solid fa-arrow-down"></i></button>
+                        </div>
+                        <button class="hover:text-slate-200">Reply</button>
+                        <button class="hover:text-slate-200">Share</button>
+                    </div>
+                </div>
+
+                <!-- Comment 6 -->
+                <div class="reddit-card p-4 space-y-2">
+                    <div class="flex items-center justify-between text-xs text-slate-400">
+                        <div class="flex items-center space-x-2">
+                            <div class="w-6 h-6 rounded-full bg-indigo-700 flex items-center justify-center font-bold text-white text-[10px]">DT</div>
+                            <span class="font-bold text-slate-200">u/DataJunkie_01</span>
+                            <span>•</span>
+                            <span>15 minutes ago</span>
+                        </div>
+                    </div>
+                    <p class="text-sm text-slate-300 pl-8 leading-relaxed">
+                        As a former tech contractor who worked near the bio-tech corridors: the hardware required for low-latency memory synthesis is smaller than a smartphone now. If you have a cleanroom terminal, you have a weapon. Stay safe out there people.
+                    </p>
+                    <div class="flex items-center space-x-4 text-xs font-bold text-slate-400 pl-8 pt-1">
+                        <div class="flex items-center space-x-1">
+                            <button class="hover:text-orange-500"><i class="fa-solid fa-arrow-up"></i></button>
+                            <span class="text-slate-200">45</span>
+                            <button class="hover:text-blue-500"><i class="fa-solid fa-arrow-down"></i></button>
+                        </div>
+                        <button class="hover:text-slate-200">Reply</button>
+                        <button class="hover:text-slate-200">Share</button>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Sidebar Section -->
+        <aside class="lg:col-span-4 space-y-4">
+            <div class="reddit-card p-4 space-y-3">
+                <div class="bg-orange-700 text-white font-bold px-3 py-2 rounded text-xs uppercase tracking-wider">
+                    About Community
+                </div>
+                <p class="text-xs text-slate-300 leading-relaxed">
+                    r/Conspiracy is a community dedicated to free discourse on fringe theories, forbidden archives, and systemic anomalies. Year 2055 active monitoring enabled.
+                </p>
+                <div class="border-t border-[#343536] pt-3 flex justify-between text-xs font-bold text-slate-300">
+                    <div>
+                        <div class="text-slate-100 text-sm">3.4M</div>
+                        <div class="text-slate-500 font-normal">Conspiracy Theorists</div>
+                    </div>
+                    <div>
+                        <div class="text-emerald-400 text-sm">1,240</div>
+                        <div class="text-slate-500 font-normal">Online in Cleanrooms</div>
+                    </div>
+                </div>
+                <div class="border-t border-[#343536] pt-3 text-xs text-slate-400 space-y-2">
+                    <div class="font-bold text-slate-300 uppercase tracking-widest text-[10px]">Rules</div>
+                    <ol class="list-decimal list-inside space-y-1 text-slate-400">
+                        <li>Submit your source memories.</li>
+                        <li>No validation of state-approved timelines.</li>
+                        <li>Report any sudden timeline gaps immediately.</li>
+                    </ol>
+                </div>
+            </div>
+
+            <div class="reddit-card p-4 space-y-3 text-xs text-slate-400">
+                <div class="font-bold text-slate-200 uppercase tracking-widest text-[10px]">Trending Topics (2055)</div>
+                <div class="space-y-2">
+                    <a href="#" class="block hover:text-white transition">#PenalMemoryAct</a>
+                    <a href="#" class="block hover:text-white transition">#GhostMemorySyndrome</a>
+                    <a href="#" class="block hover:text-white transition">#NemosyneCleanrooms</a>
+                    <a href="#" class="block hover:text-white transition">#GenevaCognitiveProtocol</a>
+                </div>
+            </div>
+        </aside>
+
+    </main>
+
+</body>
+</html>

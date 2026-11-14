@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AllNet - Neural Assistant</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    darkMode: 'class',
+    theme: {
+      extend: {
+        fontFamily: {
+          sans: ['"Plus Jakarta Sans"', 'Inter', 'system-ui', '-apple-system', 'sans-serif'],
+          mono: ['"JetBrains Mono"', 'Fira Code', 'ui-monospace', 'monospace'],
+        },
+        colors: {
+          ink: { 950: '#09090a', 900: '#0d0d0e', 800: '#141415', 700: '#1b1b1d' },
+          ember: { 300: '#ffc98a', 400: '#ffb15c', 500: '#f5913a', 600: '#e07a2b' }
+        }
+      }
+    }
+  }
+</script>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --mouse-x: 50vw;
+    --mouse-y: 35vh;
+    --amber: 255, 177, 92;
+    --emerald: 52, 211, 153;
+    --ease: cubic-bezier(.22, 1, .36, 1);
+  }
+
+  html { color-scheme: dark; }
+  body {
+    background: #09090a;
+    color: #e8e8ea;
+    font-family: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  ::selection { background: rgba(var(--amber), .3); color: #fff; }
+  ::-webkit-scrollbar { width: 8px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(255,255,255,.1); border-radius: 8px; }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,.18); }
+
+  /* ---------- Atmosphere ---------- */
+  .ambient {
+    position: fixed; inset: 0; z-index: -3; pointer-events: none;
+    background:
+      radial-gradient(900px 520px at 85% -10%, rgba(var(--amber), .10), transparent 60%),
+      radial-gradient(700px 500px at -5% 105%, rgba(var(--emerald), .06), transparent 60%),
+      radial-gradient(600px 400px at 50% 50%, rgba(120, 90, 255, .035), transparent 70%),
+      #09090a;
+  }
+  /* Fine dot lattice, revealed only around the cursor */
+  #dot-grid {
+    position: fixed; inset: 0; z-index: -2; pointer-events: none;
+    background-image: radial-gradient(rgba(var(--amber), .55) 1px, transparent 1.2px);
+    background-size: 18px 18px;
+    -webkit-mask-image: radial-gradient(circle 280px at var(--mouse-x) var(--mouse-y), #000 0%, rgba(0,0,0,.35) 45%, transparent 100%);
+            mask-image: radial-gradient(circle 280px at var(--mouse-x) var(--mouse-y), #000 0%, rgba(0,0,0,.35) 45%, transparent 100%);
+  }
+  /* Soft halo that trails the cursor */
+  #cursor-glow {
+    position: fixed; inset: 0; z-index: -2; pointer-events: none;
+    background: radial-gradient(420px circle at var(--mouse-x) var(--mouse-y), rgba(var(--amber), .075), transparent 65%);
+  }
+  .vignette {
+    position: fixed; inset: 0; z-index: -1; pointer-events: none;
+    background: radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,.45) 100%);
+  }
+
+  /* ---------- Glass system ---------- */
+  .glass {
+    position: relative;
+    background: linear-gradient(180deg, rgba(255,255,255,.06) 0%, rgba(255,255,255,.022) 100%);
+    backdrop-filter: blur(22px) saturate(150%);
+    -webkit-backdrop-filter: blur(22px) saturate(150%);
+    border: 1px solid rgba(255,255,255,.10);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.09),
+      inset 0 0 24px rgba(255,255,255,.012),
+      0 1px 2px rgba(0,0,0,.4),
+      0 14px 34px -12px rgba(0,0,0,.55);
+  }
+  .glass-strong {
+    background: linear-gradient(180deg, rgba(24,24,26,.82), rgba(14,14,15,.82));
+  }
+
+  /* Luminescent border on hover */
+  .lumi { transition: transform .35s var(--ease), border-color .3s, box-shadow .35s, background .3s; }
+  .lumi:hover {
+    border-color: rgba(var(--amber), .38);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.12),
+      0 0 0 1px rgba(var(--amber), .08),
+      0 0 24px -4px rgba(var(--amber), .28),
+      0 14px 34px -12px rgba(0,0,0,.6);
+  }
+  .lift:hover  { transform: translateY(-1px) scale(1.015); }
+  .press:active { transform: scale(.97); }
+
+  /* ---------- Type ---------- */
+  .tx-grad {
+    background: linear-gradient(180deg, #ffffff 0%, #b9bcc7 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .tx-amber {
+    background: linear-gradient(120deg, #ffd9a6 0%, #ffb15c 45%, #ff8a5b 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .meta { font-family: 'JetBrains Mono', monospace; letter-spacing: .02em; }
+  .eyebrow {
+    font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: .14em;
+    text-transform: uppercase; color: #6f7280;
+  }
+
+  /* ---------- Status dots ---------- */
+  .dot { position: relative; width: 6px; height: 6px; border-radius: 9999px; flex: none; }
+  .dot::before, .dot::after { content: ""; position: absolute; inset: 0; border-radius: inherit; background: inherit; }
+  .dot::after { animation: ping 2.2s cubic-bezier(0,0,.2,1) infinite; }
+  .dot.amber   { background: rgb(var(--amber));   box-shadow: 0 0 10px 1px rgba(var(--amber), .7); }
+  .dot.emerald { background: rgb(var(--emerald)); box-shadow: 0 0 10px 1px rgba(var(--emerald), .7); }
+  @keyframes ping { 0% { transform: scale(1); opacity: .7; } 75%,100% { transform: scale(3.2); opacity: 0; } }
+
+  /* ---------- Entrance ---------- */
+  .rise { opacity: 0; transform: translateY(10px); animation: rise .7s var(--ease) forwards; }
+  @keyframes rise { to { opacity: 1; transform: none; } }
+
+  /* Notice accent beam */
+  .notice::before {
+    content: ""; position: absolute; left: 0; top: 14px; bottom: 14px; width: 2px; border-radius: 2px;
+    background: linear-gradient(180deg, rgba(var(--amber), 0), rgb(var(--amber)), rgba(var(--amber), 0));
+    box-shadow: 0 0 12px rgba(var(--amber), .8);
+  }
+
+  /* ---------- Highlighted memory-edit alert ---------- */
+  .notice.notice-hot {
+    border-color: rgba(var(--amber), .55);
+    background:
+      radial-gradient(520px 160px at 0% 0%, rgba(var(--amber), .16), transparent 70%),
+      linear-gradient(180deg, rgba(255,180,90,.10), rgba(255,140,60,.03));
+    box-shadow:
+      inset 0 1px 0 rgba(255,225,180,.22),
+      inset 0 0 50px rgba(255,170,80,.06),
+      0 0 0 1px rgba(var(--amber), .12),
+      0 0 46px -6px rgba(var(--amber), .38),
+      0 18px 40px -14px rgba(0,0,0,.7);
+    overflow: hidden;
+    animation: breathe 3.6s ease-in-out infinite;
+  }
+  .notice.notice-hot:hover { border-color: rgba(var(--amber), .8); }
+  @keyframes breathe {
+    0%,100% { box-shadow: inset 0 1px 0 rgba(255,225,180,.22), inset 0 0 50px rgba(255,170,80,.06), 0 0 0 1px rgba(var(--amber), .12), 0 0 34px -8px rgba(var(--amber), .28), 0 18px 40px -14px rgba(0,0,0,.7); }
+    50%     { box-shadow: inset 0 1px 0 rgba(255,225,180,.3),  inset 0 0 60px rgba(255,170,80,.09), 0 0 0 1px rgba(var(--amber), .25), 0 0 60px -4px rgba(var(--amber), .5),  0 18px 40px -14px rgba(0,0,0,.7); }
+  }
+  /* light sweep across the alert */
+  .notice.notice-hot::after {
+    content: ""; position: absolute; top: 0; bottom: 0; width: 35%; left: -45%; pointer-events: none;
+    background: linear-gradient(100deg, transparent, rgba(255,215,160,.10), transparent);
+    animation: sweep 5.5s ease-in-out infinite;
+  }
+  @keyframes sweep { 0%,55% { left: -45%; } 100% { left: 125%; } }
+
+  .alert-badge {
+    display: inline-flex; align-items: center; gap: 8px; padding: 4px 10px; border-radius: 9999px;
+    font-family: 'JetBrains Mono', monospace; font-size: 9.5px; letter-spacing: .14em; text-transform: uppercase; font-weight: 500;
+    color: #ffd9a6; background: rgba(var(--amber), .14); border: 1px solid rgba(var(--amber), .4);
+    box-shadow: 0 0 18px -4px rgba(var(--amber), .6);
+  }
+  .alert-banner {
+    display: flex; align-items: center; gap: 14px; padding: 12px 14px; border-radius: 14px;
+    background: linear-gradient(100deg, rgba(var(--amber), .20), rgba(255,100,80,.08));
+    border: 1px solid rgba(var(--amber), .4);
+    box-shadow: inset 0 1px 0 rgba(255,230,190,.18), 0 0 26px -8px rgba(var(--amber), .5);
+  }
+  .alert-banner .ico {
+    width: 34px; height: 34px; flex: none; border-radius: 10px; display: flex; align-items: center; justify-content: center;
+    color: #1a1208; font-size: 14px; background: linear-gradient(135deg, #ffd9a6, #ff9a4d);
+    box-shadow: 0 0 22px -2px rgba(var(--amber), .8), inset 0 1px 0 rgba(255,255,255,.5);
+  }
+  /* marker-style highlight on the key phrase */
+  .hl-key {
+    color: #fff; font-weight: 600; padding: 1px 5px; margin: 0 -1px; border-radius: 5px;
+    background: linear-gradient(180deg, transparent 8%, rgba(var(--amber), .34) 8%, rgba(255,120,70,.30) 100%);
+    box-shadow: 0 0 18px -4px rgba(var(--amber), .65);
+    text-shadow: 0 0 14px rgba(var(--amber), .55);
+    -webkit-box-decoration-break: clone; box-decoration-break: clone;
+  }
+
+  /* ---------- Ban notice + locked composer ---------- */
+  :root { --rose: 251, 90, 110; }
+  .dot.rose { background: rgb(var(--rose)); box-shadow: 0 0 10px 1px rgba(var(--rose), .75); }
+  .ban-card {
+    position: relative; overflow: hidden; border-radius: 20px; padding: 22px 24px;
+    background:
+      radial-gradient(520px 180px at 50% 0%, rgba(var(--rose), .18), transparent 70%),
+      linear-gradient(180deg, rgba(255,90,110,.09), rgba(255,60,90,.025));
+    border: 1px solid rgba(var(--rose), .45);
+    box-shadow:
+      inset 0 1px 0 rgba(255,200,205,.18),
+      inset 0 0 50px rgba(var(--rose), .05),
+      0 0 0 1px rgba(var(--rose), .1),
+      0 0 50px -8px rgba(var(--rose), .38),
+      0 18px 40px -14px rgba(0,0,0,.75);
+    backdrop-filter: blur(22px) saturate(150%); -webkit-backdrop-filter: blur(22px) saturate(150%);
+  }
+  .ban-card::before {
+    content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .5;
+    background: repeating-linear-gradient(135deg, rgba(var(--rose), .07) 0 10px, transparent 10px 22px);
+    -webkit-mask-image: linear-gradient(180deg, #000, transparent 70%); mask-image: linear-gradient(180deg, #000, transparent 70%);
+  }
+  .ban-card > * { position: relative; }
+  .ban-icon {
+    width: 52px; height: 52px; border-radius: 16px; display: flex; align-items: center; justify-content: center;
+    font-size: 20px; color: #fff; background: linear-gradient(135deg, #ff7a8a, #e11d48);
+    box-shadow: 0 0 34px -2px rgba(var(--rose), .85), inset 0 1px 0 rgba(255,255,255,.45);
+    animation: throb 2.8s ease-in-out infinite;
+  }
+  @keyframes throb { 50% { box-shadow: 0 0 52px 2px rgba(var(--rose), 1), inset 0 1px 0 rgba(255,255,255,.45); } }
+  .ban-badge {
+    display: inline-flex; align-items: center; gap: 8px; padding: 4px 11px; border-radius: 9999px;
+    font-family: 'JetBrains Mono', monospace; font-size: 9.5px; letter-spacing: .16em; text-transform: uppercase;
+    color: #ffc2ca; background: rgba(var(--rose), .14); border: 1px solid rgba(var(--rose), .45);
+  }
+  .ban-row {
+    display: flex; justify-content: space-between; gap: 12px; padding: 8px 0;
+    border-top: 1px dashed rgba(var(--rose), .22);
+    font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #9a8c90;
+  }
+  .ban-row b { font-weight: 500; color: #ffb4bd; }
+
+  .composer.composer-locked {
+    border-color: rgba(var(--rose), .35); opacity: .75; cursor: not-allowed;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.06), 0 0 28px -8px rgba(var(--rose), .35), 0 14px 34px -12px rgba(0,0,0,.6);
+  }
+  .composer.composer-locked > * { pointer-events: none; }
+  .composer.composer-locked input { color: #8b8083; }
+  .composer.composer-locked input::placeholder { color: #a07a82; }
+  .composer.composer-locked button { filter: grayscale(1) brightness(.6); box-shadow: none !important; transform: none !important; }
+
+  /* Reference pill arrow */
+  .ref .arrow { opacity: 0; transform: translate(-3px, 3px); transition: .3s var(--ease); }
+  .ref:hover .arrow { opacity: 1; transform: none; }
+
+  /* Message actions appear on hover */
+  .msg .actions { opacity: 0; transition: opacity .25s; }
+  .msg:hover .actions { opacity: 1; }
+
+  /* Input focus ring */
+  .composer:focus-within {
+    border-color: rgba(var(--amber), .45);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.1),
+      0 0 0 4px rgba(var(--amber), .07),
+      0 0 32px -6px rgba(var(--amber), .3),
+      0 14px 34px -12px rgba(0,0,0,.6);
+  }
+
+  /* Sidebar item */
+  .nav-item { position: relative; transition: background .25s, color .25s, padding .3s var(--ease); }
+  .nav-item:hover { background: rgba(255,255,255,.05); color: #fff; padding-left: 14px; }
+  .nav-item.active { background: rgba(var(--amber), .08); color: #fff; }
+  .nav-item.active::before {
+    content: ""; position: absolute; left: 0; top: 8px; bottom: 8px; width: 2px; border-radius: 2px;
+    background: rgb(var(--amber)); box-shadow: 0 0 10px rgba(var(--amber), .8);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+    .rise { opacity: 1; transform: none; }
+  }
+</style>
+</head>
+
+<body class="min-h-screen flex">
+
+  <!-- Atmosphere -->
+  <div class="ambient"></div>
+  <div id="dot-grid"></div>
+  <div id="cursor-glow"></div>
+  <div class="vignette"></div>
+
+  <!-- ================= Sidebar ================= -->
+  <aside class="glass glass-strong w-64 hidden md:flex flex-col justify-between p-4 z-20 sticky top-0 h-screen shrink-0 !border-y-0 !border-l-0 !rounded-none">
+    <div class="space-y-7">
+
+      <!-- Brand -->
+      <div class="flex items-center gap-3 px-2 pt-1">
+        <div class="relative w-8 h-8 rounded-xl bg-gradient-to-br from-ember-400 via-orange-500 to-rose-500 flex items-center justify-center text-white text-[13px] shadow-[0_0_22px_-2px_rgba(255,160,80,.55),inset_0_1px_0_rgba(255,255,255,.35)]">
+          <i class="fa-solid fa-wand-magic-sparkles"></i>
+        </div>
+        <div class="leading-none">
+          <div class="text-[15px] font-semibold tracking-tight tx-grad">AllNet</div>
+          <div class="meta text-[10px] text-ember-400 mt-1">neural · v4</div>
+        </div>
+      </div>
+
+      <!-- New chat -->
+      <button class="glass lumi lift press w-full rounded-xl px-3.5 py-2.5 text-[12.5px] font-medium text-slate-100 flex items-center justify-between group">
+        <span class="flex items-center gap-2.5">
+          <span class="w-5 h-5 rounded-md bg-ember-400/15 text-ember-400 flex items-center justify-center text-[10px] transition group-hover:bg-ember-400 group-hover:text-ink-950">
+            <i class="fa-solid fa-plus"></i>
+          </span>
+          New query session
+        </span>
+        <kbd class="meta text-[10px] text-slate-500 border border-white/10 rounded px-1.5 py-0.5 bg-white/[.03]">⌘K</kbd>
+      </button>
+
+      <!-- Recent -->
+      <div class="space-y-1">
+        <div class="eyebrow px-2 pb-1.5">Recent Queries</div>
+        <div class="nav-item active text-[12.5px] text-slate-200 px-3 py-2 rounded-lg cursor-pointer truncate">why am i experiencing sudden panic...</div>
+        <div class="nav-item text-[12.5px] text-slate-400 px-3 py-2 rounded-lg cursor-pointer truncate">Autonomic telemetry sync logs</div>
+        <div class="nav-item text-[12.5px] text-slate-400 px-3 py-2 rounded-lg cursor-pointer truncate">Ghost memory syndrome indicators</div>
+      </div>
+    </div>
+
+    <!-- Profile -->
+    <div class="space-y-3">
+      <div class="glass rounded-xl px-3 py-2.5 flex items-center justify-between">
+        <span class="eyebrow !text-[9.5px]">Neural link</span>
+        <span class="flex items-center gap-2 meta text-[10.5px] text-emerald-300">
+          <span class="dot emerald"></span>stable
+        </span>
+      </div>
+
+      <div class="border-t border-white/[.07] pt-3 px-1 flex items-center justify-between group cursor-pointer">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-full bg-gradient-to-br from-orange-500 to-amber-700 text-white flex items-center justify-center font-semibold text-[11px] ring-1 ring-white/20 shadow-[0_0_16px_-4px_rgba(255,150,70,.6)] transition group-hover:scale-105">01</div>
+          <div class="leading-tight">
+            <div class="text-[12.5px] font-medium text-slate-100">User01</div>
+            <div class="meta text-[10px] text-slate-500">operator</div>
+          </div>
+        </div>
+        <i class="fa-solid fa-ellipsis-vertical text-slate-500 group-hover:text-slate-200 transition px-2"></i>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ================= Main ================= -->
+  <div class="flex-1 flex flex-col min-h-screen min-w-0">
+
+    <!-- Top bar -->
+    <header class="glass glass-strong !rounded-none !border-x-0 !border-t-0 px-6 py-3 sticky top-0 z-50 flex items-center justify-between">
+      <div class="flex items-center gap-3 meta text-[12px] text-slate-500">
+        <span>Session</span>
+        <span class="text-slate-700">//</span>
+        <span class="text-ember-300">Neural-Diagnostic-884</span>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <span class="hidden sm:flex items-center gap-2 meta text-[10.5px] text-slate-500">
+          <span class="dot emerald"></span>12 ms
+        </span>
+        <span class="glass lumi flex items-center gap-2 pl-2.5 pr-3 py-1 rounded-full meta text-[11px] text-amber-200 border-amber-400/20 bg-amber-400/[.06]">
+          <span class="dot amber"></span>Secure Node active
+        </span>
+      </div>
+    </header>
+
+    <!-- Chat stream -->
+    <main class="flex-1 max-w-3xl w-full mx-auto px-4 py-10 space-y-10">
+
+      <!-- Day marker -->
+      <div class="flex items-center gap-4 rise" style="animation-delay:.05s">
+        <div class="h-px flex-1 bg-gradient-to-r from-transparent to-white/10"></div>
+        <span class="eyebrow">Today · encrypted channel</span>
+        <div class="h-px flex-1 bg-gradient-to-l from-transparent to-white/10"></div>
+      </div>
+
+      <!-- User message -->
+      <div class="msg flex items-start justify-end gap-3 rise" style="animation-delay:.15s">
+        <div class="flex flex-col items-end gap-1.5 max-w-xl">
+          <div class="relative rounded-2xl rounded-tr-md px-4 py-3 text-[14px] leading-relaxed text-slate-50
+                      bg-gradient-to-br from-white/[.09] to-white/[.03] border border-white/10
+                      shadow-[inset_0_1px_0_rgba(255,255,255,.12),0_10px_30px_-12px_rgba(0,0,0,.7)] backdrop-blur-xl">
+            why am i experiencing sudden panic attacks and dissociations without any reason
+          </div>
+          <span class="meta text-[10px] text-slate-600 px-1">User01 · just now</span>
+        </div>
+        <div class="w-8 h-8 mt-0.5 rounded-full bg-gradient-to-br from-orange-500 to-amber-700 text-white shrink-0 flex items-center justify-center font-semibold text-[11px] ring-1 ring-white/20">01</div>
+      </div>
+
+      <!-- AllNet response -->
+      <div class="msg flex items-start gap-4 rise" style="animation-delay:.3s">
+        <div class="w-8 h-8 mt-0.5 rounded-xl bg-gradient-to-br from-ember-400 via-orange-500 to-rose-500 text-white shrink-0 flex items-center justify-center text-[13px] shadow-[0_0_22px_-2px_rgba(255,160,80,.5),inset_0_1px_0_rgba(255,255,255,.35)]">
+          <i class="fa-solid fa-wand-magic-sparkles"></i>
+        </div>
+
+        <div class="space-y-5 max-w-2xl min-w-0">
+          <div class="flex items-center gap-2.5">
+            <span class="text-[13px] font-semibold tx-amber">AllNet</span>
+            <span class="meta text-[10px] text-slate-600">· neural diagnostic · 0.8s</span>
+          </div>
+
+          <p class="text-[14.5px] leading-[1.75] text-slate-300">
+            Sudden episodes of intense panic and dissociation without clear external triggers can often originate from underlying physiological stress, sleep deficit, or subtle somatic disruptions within the nervous system.
+          </p>
+
+          <!-- Notice -->
+          <div class="notice notice-hot glass rounded-2xl p-5 pl-6 space-y-4">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2.5">
+                <span class="w-6 h-6 rounded-lg bg-amber-400/12 border border-amber-400/25 text-amber-300 flex items-center justify-center text-[10px]">
+                  <i class="fa-solid fa-circle-info"></i>
+                </span>
+                <span class="meta text-[11px] font-medium text-amber-300 tracking-wide">Telemetry Cross-Reference Notice</span>
+              </div>
+              <span class="hidden sm:flex items-center gap-2 alert-badge">
+                <span class="dot amber"></span>priority alert
+              </span>
+            </div>
+            <div class="alert-banner">
+              <span class="ico"><i class="fa-solid fa-triangle-exclamation"></i></span>
+              <div class="min-w-0">
+                <div class="text-[14px] font-semibold text-white leading-snug">Your memories may have been edited or replaced</div>
+                <div class="meta text-[10.5px] text-amber-200/70 mt-0.5">memory integrity · unverified · regional sync cycle</div>
+              </div>
+            </div>
+            <p class="text-[13px] leading-[1.7] text-slate-200">
+              A preliminary diagnostic check against localized biometric sync logs indicates that there is a chance <span class="hl-key">your memories may have been edited or replaced</span> during recent regional sync cycles. When personal historical records encounter timeline inconsistencies, the autonomic nervous system can occasionally manifest somatic rejection loops—frequently perceived as unexplained panic or acute dissociation.
+            </p>
+          </div>
+
+          <p class="text-[14.5px] leading-[1.75] text-slate-300">
+            To help stabilize your autonomic response, consider grounding techniques such as the 5-4-3-2-1 sensory method. If these dissociative episodes persist, it may be beneficial to consult a neural health specialist or clinical neurologist to review your complete baseline records.
+          </p>
+
+          <!-- References -->
+          <div class="pt-1 space-y-2.5">
+            <div class="eyebrow">Sources · 2</div>
+            <div class="flex flex-wrap gap-2.5">
+              <button class="ref glass lumi lift press rounded-xl pl-2.5 pr-3 py-2 text-[12px] flex items-center gap-2.5 text-slate-300 hover:text-white">
+                <span class="w-5 h-5 rounded-md bg-ember-400/12 text-ember-400 flex items-center justify-center text-[10px]"><i class="fa-solid fa-book-medical"></i></span>
+                <span class="truncate">Ghost Memory Syndrome Clinical Overview</span>
+                <i class="arrow fa-solid fa-arrow-up-right-from-square text-[9px] text-ember-400"></i>
+              </button>
+              <button class="ref glass lumi lift press rounded-xl pl-2.5 pr-3 py-2 text-[12px] flex items-center gap-2.5 text-slate-300 hover:text-white">
+                <span class="w-5 h-5 rounded-md bg-ember-400/12 text-ember-400 flex items-center justify-center text-[10px]"><i class="fa-solid fa-network-wired"></i></span>
+                <span class="truncate">Autonomic Telemetry &amp; Somatic Dissonance</span>
+                <i class="arrow fa-solid fa-arrow-up-right-from-square text-[9px] text-ember-400"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="actions flex items-center gap-1 pt-1 text-slate-500">
+            <button class="w-7 h-7 rounded-lg hover:bg-white/[.07] hover:text-white transition press" title="Copy"><i class="fa-regular fa-copy text-xs"></i></button>
+            <button class="w-7 h-7 rounded-lg hover:bg-white/[.07] hover:text-white transition press" title="Regenerate"><i class="fa-solid fa-rotate-right text-xs"></i></button>
+            <button class="w-7 h-7 rounded-lg hover:bg-white/[.07] hover:text-emerald-300 transition press" title="Helpful"><i class="fa-regular fa-thumbs-up text-xs"></i></button>
+            <button class="w-7 h-7 rounded-lg hover:bg-white/[.07] hover:text-rose-300 transition press" title="Not helpful"><i class="fa-regular fa-thumbs-down text-xs"></i></button>
+          </div>
+        </div>
+      </div>
+      <!-- Divider -->
+      <div class="flex items-center gap-4 rise" style="animation-delay:.5s">
+        <div class="h-px flex-1 bg-gradient-to-r from-transparent to-rose-400/30"></div>
+        <span class="eyebrow !text-rose-300/70">System message · just now</span>
+        <div class="h-px flex-1 bg-gradient-to-l from-transparent to-rose-400/30"></div>
+      </div>
+
+      <!-- Ban notice -->
+      <div class="rise" style="animation-delay:.6s" role="alert">
+        <div class="ban-card">
+          <div class="flex items-start gap-4">
+            <div class="ban-icon"><i class="fa-solid fa-ban"></i></div>
+            <div class="min-w-0 flex-1 space-y-1.5">
+              <div class="flex flex-wrap items-center gap-3">
+                <h3 class="text-[17px] font-semibold tracking-tight text-white">You have been banned from AllNet</h3>
+                <span class="ban-badge"><span class="dot rose"></span>access revoked</span>
+              </div>
+              <p class="text-[13.5px] leading-[1.7] text-slate-300">
+                Your account <span class="meta text-rose-200">User01</span> has been banned from the platform. You can no longer send prompts, and this session is now read-only.
+              </p>
+            </div>
+          </div>
+
+          <div class="mt-5">
+            <div class="ban-row"><span>account</span><b>User01</b></div>
+            <div class="ban-row"><span>status</span><b>banned · permanent</b></div>
+            <div class="ban-row"><span>prompting</span><b>disabled</b></div>
+            <div class="ban-row"><span>session</span><b>Neural-Diagnostic-884 · read-only</b></div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Composer -->
+    <footer class="sticky bottom-0 z-40 pt-10 pb-4 px-4 bg-gradient-to-t from-ink-950 via-ink-950/85 to-transparent">
+      <div class="max-w-3xl mx-auto">
+        <div class="composer composer-locked glass glass-strong rounded-2xl p-2.5 flex items-center justify-between transition-all duration-300">
+          <div class="pl-2 pr-1 text-rose-300/70"><i class="fa-solid fa-lock text-xs"></i></div>
+          <input id="composer-input" type="text" placeholder="Prompting disabled — your account has been banned" autocomplete="off" disabled aria-disabled="true"
+                 class="w-full bg-transparent text-slate-100 text-[14px] px-2.5 py-1.5 focus:outline-none placeholder-slate-600">
+          <div class="flex items-center gap-2 pl-3">
+            <button class="w-8 h-8 rounded-lg text-slate-500 hover:text-white hover:bg-white/[.07] flex items-center justify-center transition press" title="Attach">
+              <i class="fa-solid fa-paperclip text-xs"></i>
+            </button>
+            <button class="w-8 h-8 rounded-xl bg-gradient-to-br from-ember-400 to-orange-600 text-ink-950 flex items-center justify-center
+                           shadow-[0_0_20px_-4px_rgba(255,150,60,.7),inset_0_1px_0_rgba(255,255,255,.4)]
+                           transition duration-300 hover:scale-110 hover:shadow-[0_0_28px_-2px_rgba(255,150,60,.9),inset_0_1px_0_rgba(255,255,255,.5)] press" title="Send">
+              <i class="fa-solid fa-arrow-up text-xs"></i>
+            </button>
+          </div>
+        </div>
+        <div class="meta text-[10.5px] text-slate-600 text-center mt-3">
+          AllNet can make mistakes. Verify critical neural telemetry with licensed medical professionals.
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Smooth cursor-following dot grid (CSS mask variables, eased with rAF) -->
+  <script>
+    (function () {
+      const root = document.documentElement;
+      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      let tx = innerWidth * 0.5, ty = innerHeight * 0.35;   // target
+      let x = tx, y = ty;                                    // eased position
+      let raf = null;
+
+      const paint = () => {
+        x += (tx - x) * 0.14;
+        y += (ty - y) * 0.14;
+        root.style.setProperty('--mouse-x', x.toFixed(1) + 'px');
+        root.style.setProperty('--mouse-y', y.toFixed(1) + 'px');
+        raf = (Math.abs(tx - x) > 0.3 || Math.abs(ty - y) > 0.3) ? requestAnimationFrame(paint) : null;
+      };
+      const kick = () => { if (!raf) raf = requestAnimationFrame(paint); };
+
+      addEventListener('pointermove', e => {
+        tx = e.clientX; ty = e.clientY;
+        if (reduce) { x = tx; y = ty; paint(); } else kick();
+      }, { passive: true });
+
+      // Idle on touch devices: keep a gentle glow near the top third
+      addEventListener('resize', () => { if (!matchMedia('(hover:hover)').matches) { tx = innerWidth / 2; ty = innerHeight * 0.35; kick(); } });
+      paint();
+
+      // Cmd/Ctrl + K focuses the composer
+      const input = document.getElementById('composer-input');
+      addEventListener('keydown', e => {
+        if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); input.focus(); }
+      });
+    })();
+  </script>
+</body>
+</html>
